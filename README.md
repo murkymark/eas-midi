@@ -19,6 +19,55 @@ This synth is an alternative to Libtimidity or Fluidsynth.
   
 Since "Sonic Network", "Sonivox" and are registered names I don't use them in the project name. "Embedded Audio Synthesis" is not registered (anymore?) as it seems.
 
-# Project status: 0%  
+# Project status: 10%  
+<pre>
 notes:  
-Maybe it is a good idea to separate the file parsers from the library, so it can be compiled without them. File formats should all be optional. Since the library embeds a default sound bank there is no need for additional external files. Pushing MIDI commands and pulling output PCM data shall be mandatory, while everything furhter is optional.
+Maybe it is a good idea to separate the file parsers from the library, so it can be compiled without them. File formats should all be optional. Since the library embeds a default sound bank there is no need for additional external files. Pushing MIDI commands and pulling output PCM data shall be mandatory, while everything further is optional.  
+lib accesses different file format parsers via function pointers  
+file format parsers should be abstracted from the lib  
+the user shall be able to add a format parser without recompiling the library, thus the lib needs a dynamic parser list  
+	then the lib provides a way to try all parsers on a file to find the right one, or find the correct one by a user passed ID, if the user knows the format (a simple loop through a parser list should be enough, although a hash table would be best)  
+  
+user->lib->parser_base
+   |___add___^
+
+//the user can add new parsers at runtime (from shared libs), but may need to write a wrapper to make it compatible with parser_base
+
+parser_register(parser_setup_struct){
+  //register parser in parser list
+  //fail if ID already registered
+}
+
+open_format(file_handle, filename_extention, ID, try_all){
+ //1 try ID directly (like MIME type, type can be UNKNOWN): locate parser ID in parser list (hash table would be most efficient)
+ //2 if failed before: try to identify by file name extension
+ //3 if failed before  &&  try_all == true : try to open with all parsers until a working one is found (brute force)
+}
+
+
+notes:
+- they used some auto processing tool to automatically comment out all error messages in the source code, seems missing here
+  to revert look for "{ /* dpp:", uncomment and replace "EAS_ReporteX" with "EAS_ReportX"
+- sadly internal functions and attributes are not documented
+- 48000Hz not supported?
+  it seems the correct sound bank is needed, else we get "EAS_Prepare returned -30"
+    - with "wt_22khz.c" only _SAMPLE_RATE_22050 works
+    - after switching  with "wt_44khz.c" instead only _SAMPLE_RATE_44100 works
+   -> check happens in VMValidateEASLib() and can be commented out - I commented out the return and uncommented the error message
+ => it seems the EAS lib package is not complete in the Android release - there was probably a sound bank C file for each of the predefined sample rates
+
+- I moved all the JET code to the "unused" folder
+- I switched "eas_hostmm.c" with "eas_host.c", memmory mapped files are not C standart, there are more portable ways using user controlled functions pointers for I/O
+
+
+Planned:
+We have a lib and host module  
+  The original lib code includes the host, while host is user defined/adapted  
+  That throws up the typical compile time lib dependency user->lib to user->lib->user  
+  I think setup via function pointers to user wrappers would be better  
+    a good way is to use a config struct the user can set up and pass to the lib
+    the lib shall include a default struct for file and memory I/O
+
+</pre>
+  
+

@@ -3467,17 +3467,18 @@ EAS_RESULT VMValidateEASLib (EAS_SNDLIB_HANDLE pEAS)
     {
         if (pEAS->identifier != _EAS_LIBRARY_VERSION)
         {
-            { /* dpp: EAS_ReportEx(_EAS_SEVERITY_ERROR, "VMValidateEASLib: Sound library mismatch in sound library: Read 0x%08x, expected 0x%08x\n",
-                pEAS->identifier, _EAS_LIBRARY_VERSION); */ }
+            EAS_ReportX(_EAS_SEVERITY_ERROR, "VMValidateEASLib: Sound library mismatch in sound library: Read 0x%08x, expected 0x%08x\n",
+                pEAS->identifier, _EAS_LIBRARY_VERSION);
             return EAS_ERROR_SOUND_LIBRARY;
         }
 
         /* check sample rate */
         if ((pEAS->libAttr & LIBFORMAT_SAMPLE_RATE_MASK) != _OUTPUT_SAMPLE_RATE)
         {
-            { /* dpp: EAS_ReportEx(_EAS_SEVERITY_ERROR, "VMValidateEASLib: Sample rate mismatch in sound library: Read %lu, expected %lu\n",
-                pEAS->libAttr & LIBFORMAT_SAMPLE_RATE_MASK, _OUTPUT_SAMPLE_RATE); */ }
-            return EAS_ERROR_SOUND_LIBRARY;
+            EAS_ReportX(_EAS_SEVERITY_ERROR, "VMValidateEASLib: Sample rate mismatch in sound library: Read %lu, expected %lu\n",
+                pEAS->libAttr & LIBFORMAT_SAMPLE_RATE_MASK, _OUTPUT_SAMPLE_RATE);
+//edit note: warn but don't return error, still play => may sound bad, but better than nothing (frequency could be off probably caused by missing resampling)
+//            return EAS_ERROR_SOUND_LIBRARY;
         }
 
 #ifdef _WT_SYNTH
