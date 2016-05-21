@@ -211,13 +211,15 @@ static EAS_RESULT PlayFile (EAS_DATA_HANDLE easData, const char* filename, const
 void printHelp(){
 	printf("EASmidi synth renderer\n");
 	printf("Usage:\n");
-	printf(" cmd [Option] file\n");
-	printf(" (file path must not start with \"-\")\n");
+	printf(" cmd [Option] file1 file2\n");
+	printf(" (If file starts with \"-\", use option -i)\n");
 	printf("Options:\n");
-	printf(" -d <0-9>    : Set debug level\n");
-	printf(" -f <fname>  : Print debug messages to file\n");
-	printf(" -o <fname>  : Output file\n");
-	printf(" -p<1..n>    : Polyphony, max number of voices plaing parallely\n");
+	printf(" -d<0-9>     : Set debug level\n");
+	printf(" -f<fname>   : Print debug messages to file\n");
+	printf(" -h          : Show this help\n");
+	printf(" -o<fname>   : Output file\n");
+	printf(" -i<fname>   : Input file\n");
+	printf(" -p<1..n>    : Polyphony, max number of voices playing parallelly\n");
 }
 
 
@@ -243,6 +245,7 @@ int main( int argc, char **argv )
     int temp;
     FILE *debugFile;
     char *outputFile = NULL;
+    char *inputFile = NULL;
 
     /* set the error reporting level */
     EAS_SetDebugLevel(_EAS_SEVERITY_INFO);
@@ -277,8 +280,12 @@ int main( int argc, char **argv )
             case 'h':
                 printHelp();
                 break;
+            case 'i':
+                inputFile = &argv[i][2];
+                break;
             case 'o':
                 outputFile = &argv[i][2];
+                printf("Output file: \"%s\"\n", outputFile);
                 break;
             case 'p':
                 polyphony = atoi(&argv[i][2]);
@@ -343,13 +350,18 @@ int main( int argc, char **argv )
         for (i = 1; i < argc; i++)
         {
             /* check for switch */
-            if (argv[i][0] != '-')
+            if (argv[i][0] != '-'  ||  (argv[i][0] == '-'  &&  argv[i][1] == 'i' ))
             {
-
-                EAS_ReportX(_EAS_SEVERITY_INFO, "Playing file '%s'\n", argv[i]);
-                if ((playResult = PlayFile(easData, argv[i], outputFile, pLibConfig, buffer, bufferSize)) != EAS_SUCCESS)
+                
+                if(argv[i][0] == '-'  &&  argv[i][1] == 'i' )
+                  inputFile = &argv[i][2];
+                else
+                  inputFile = argv[i];
+                
+                EAS_ReportX(_EAS_SEVERITY_INFO, "Playing file '%s'\n", inputFile);
+                if ((playResult = PlayFile(easData, inputFile, outputFile, pLibConfig, buffer, bufferSize)) != EAS_SUCCESS)
                 {
-                    EAS_ReportX(_EAS_SEVERITY_ERROR, "Error %d playing file %s\n", playResult, argv[i]);
+                    EAS_ReportX(_EAS_SEVERITY_ERROR, "Error %d playing file %s\n", playResult, inputFile);
                     break;
                 }
             }

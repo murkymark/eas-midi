@@ -1,17 +1,19 @@
 # eas-midi
 Software MIDI synthesizer forked from the Embedded Audio Synthesis library of Sonic Network, Inc. (Sonivox)  
   
-This project aims to separate the library from the Android OS source code. I couldn't find any other official release of the library.
+This project aims to provide a portable standalone library.  
   
-### This project includes:
-Dependency free library (libeasmidi)  
+### This project includes (shall include):
+Dependency free library "libeasmidi"  
 A "host wrapper" implementation to pull PCM data from the synth which can be passed to any audio API  
 Simple GNU makefile  
+Optional MIDI file to wave renderer
 Optional MIDI file player (using SDL 1.x)  
 Optional keyboard instrument with Protracker/Fasttracker like keyboard mapping for playing live (using SDL 1.x)  
   
   
-The Android OS source code contains a MIDI synth library in the directory "sonivox" with full documentation (https://android.googlesource.com/platform/external/sonivox.git). Actually this is the Embedded Audio Synthesis library of Sonic Network, Inc., licensed under the Apache License v2.0. It is intended to be used for interactive MIDI playback and synthesis on embedded hardware like a cell phone of the years 200X (for ringtones and games).  
+I couldn't find any official release of the library other than the one in the Android source.  
+The Android OS source code contains a MIDI synth library in the directory "sonivox" with API documentation (https://android.googlesource.com/platform/external/sonivox.git). Actually this is the Embedded Audio Synthesis library of Sonic Network, Inc., licensed under the Apache License v2.0. It is made for interactive MIDI playback and synthesis on embedded hardware like a cell phone of the years 200X (for ringtones and games).  
 The library contains file parsers for different MIDI song file formats and supports DLS sound bank files. It features effect filters and allows for sending MIDI commands to the synthesizer in real time.  
 A tiny General MIDI sound bank is statically included in the C code. It seems to be taken from a DLS file "wt_200k_G.dls".  
   
@@ -21,11 +23,11 @@ Since "Sonic Network", "Sonivox" and are registered names I don't use them in th
 
 # Project status: 10%  
 <pre>
-notes:  
+Notes:  
 Maybe it is a good idea to separate the file parsers from the library, so it can be compiled without them. File formats should all be optional. Since the library embeds a default sound bank there is no need for additional external files. Pushing MIDI commands and pulling output PCM data shall be mandatory, while everything further is optional.  
-lib accesses different file format parsers via function pointers  
-file format parsers should be abstracted from the lib  
-the user shall be able to add a format parser without recompiling the library, thus the lib needs a dynamic parser list  
+lib accesses different file format parsers via function pointers
+file format parsers should be abstracted from the lib
+the user shall be able to add a format parser without recompiling the library, thus the lib needs a dynamic parser list
 	then the lib provides a way to try all parsers on a file to find the right one, or find the correct one by a user passed ID, if the user knows the format (a simple loop through a parser list should be enough, although a hash table would be best)  
   
 user->lib->parser_base
@@ -55,16 +57,17 @@ notes:
     - after switching  with "wt_44khz.c" instead only _SAMPLE_RATE_44100 works
    -> check happens in VMValidateEASLib() and can be commented out - I commented out the return and uncommented the error message
  => it seems the EAS lib package is not complete in the Android release - there was probably a sound bank C file for each of the predefined sample rates
+ - embedded sample data seems to be 8 bit only (see "const EAS_SAMPLE eas_samples[]"), which render in 16 bit
 
 - I moved all the JET code to the "unused" folder
 - I switched "eas_hostmm.c" with "eas_host.c", memmory mapped files are not C standart, there are more portable ways using user controlled functions pointers for I/O
 
 
 Planned:
-We have a lib and host module  
-  The original lib code includes the host, while host is user defined/adapted  
-  That throws up the typical compile time lib dependency user->lib to user->lib->user  
-  I think setup via function pointers to user wrappers would be better  
+We have a lib and host module
+  The original lib code includes the host, while host is user defined/adapted
+  That throws up the typical compile time lib dependency user->lib to user->lib->user
+  I think setup via function pointers to user wrappers would be better
     a good way is to use a config struct the user can set up and pass to the lib
     the lib shall include a default struct for file and memory I/O
 
