@@ -32,8 +32,8 @@
  * includes
  *------------------------------------
 */
-#include "log/log.h"
-#include <cutils/log.h>
+//#include "log/log.h"
+//#include <cutils/log.h>
 
 #include "eas_types.h"
 #include "eas_math.h"
@@ -92,8 +92,8 @@ void WT_VoiceGain (S_WT_VOICE *pWTVoice, S_WT_INT_FRAME *pWTIntFrame)
     /* initialize some local variables */
     numSamples = pWTIntFrame->numSamples;
     if (numSamples <= 0) {
-        ALOGE("b/26366256");
-        android_errorWriteLog(0x534e4554, "26366256");
+//        ALOGE("b/26366256");
+//        android_errorWriteLog(0x534e4554, "26366256");
         return;
     }
     pMixBuffer = pWTIntFrame->pMixBuffer;

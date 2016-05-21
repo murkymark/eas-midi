@@ -4,7 +4,7 @@ Software MIDI synthesizer forked from the Embedded Audio Synthesis library of So
 This project aims to separate the library from the Android OS source code. I couldn't find any other official release of the library.
   
 ### This project includes:
-Dependency free library (libeasmidi)
+Dependency free library (libeasmidi)  
 A "host wrapper" implementation to pull PCM data from the synth which can be passed to any audio API  
 Simple GNU makefile  
 Optional MIDI file player (using SDL 1.x)  
@@ -17,7 +17,7 @@ A tiny General MIDI sound bank is statically included in the C code. It seems to
   
 This synth is an alternative to Libtimidity or Fluidsynth.  
   
-Since "Sonic Network" and "Sonivox" are registered names I don't know why it is called "libsonivox" in Android.
+Since "Sonic Network", "Sonivox" and are registered names I don't use them in the project name. "Embedded Audio Synthesis" is not registered (anymore?) as it seems.
 
 # Project status: 0%  
 notes:  
